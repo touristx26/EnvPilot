@@ -1,0 +1,20 @@
+# 编译产物
+bin/
+*.exe
+
+# 运行时数据
+*.db
+*.db-wal
+*.db-shm
+envpilot.db*
+
+# 冒烟测试临时文件
+.smoke/
+
+# IDE
+.vscode/
+.idea/
+
+# Go
+*.test
+*.out
