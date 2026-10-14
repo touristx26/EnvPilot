@@ -162,12 +162,13 @@ start_agent() {
   [ -n "$NAME" ] && set -- "$@" --name "$NAME"
   [ -n "$TYPE" ] && set -- "$@" --type "$TYPE"
   [ -n "$TAGS" ] && set -- "$@" --tags "$TAGS"
-  "$@"
+  # exec 必须作用于二进制而非函数名（exec 函数名并非所有 sh 实现都支持）
+  exec "$@"
 }
 
 if [ "$FOREGROUND" = "1" ]; then
   echo "==> starting envpilot-agent in foreground"
-  exec start_agent
+  start_agent
 fi
 
 # root + systemd 环境下安装为系统服务（开机自启）
@@ -200,7 +201,7 @@ Wants=network-online.target
 
 [Service]
 ExecStart=$BIN $ARGS
-$ENVLINESRestart=always
+${ENVLINES}Restart=always
 RestartSec=5
 
 [Install]

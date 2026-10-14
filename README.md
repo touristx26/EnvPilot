@@ -35,16 +35,22 @@ GOOS=linux GOARCH=arm64 go build -o bin/envpilot-agent-linux-arm64 ./cmd/agent
 
 ## 2. 启动网关
 
+`--agent-bindir` 是相对**工作目录**解析的。第 1 步编译产物都在根目录的 `bin/` 下，因此只要**在项目根目录启动**即可，无需显式指定参数：
+
 ```bash
-./envpilot-gateway --addr :8080 --token my-secret-token
+# 目录布局（编译后的项目根目录）：
+#   bin/envpilot-gateway
+#   bin/envpilot-agent-linux-amd64
+#   bin/envpilot-agent-linux-arm64
+./bin/envpilot-gateway --addr :8080 --token my-secret-token
 ```
 
 | 参数 | 默认值 | 说明 |
 |------|--------|------|
 | `--addr` | `:8080` | HTTP 监听地址 |
 | `--token` | `dev-token` | **唯一认证令牌**：agent 注册、安装脚本、MCP 调用共用 |
-| `--db` | `envpilot.db` | SQLite 路径（仅存环境元数据，重启后环境 ID 复用） |
-| `--agent-bindir` | `bin` | 各平台 agent 二进制目录（供在线安装下载） |
+| `--db` | `envpilot.db` | SQLite 路径（相对工作目录；仅存环境元数据，重启后环境 ID 复用） |
+| `--agent-bindir` | `bin` | 各平台 agent 二进制目录（相对工作目录；供在线安装下载） |
 
 网关提供 3 个端点：
 
@@ -146,8 +152,8 @@ Authorization:  Bearer my-secret-token
 ## 5. 最小验证流程
 
 ```bash
-# 1. 启动网关
-./envpilot-gateway --addr :8080 --token test-token --agent-bindir bin
+# 1. 在项目根目录启动网关（bin/ 默认相对当前目录）
+./bin/envpilot-gateway --addr :8080 --token test-token
 
 # 2. 在任一 Linux 环境注册
 curl -sSL "http://<gw>:8080/bootstrap/install.sh?token=test-token&name=env-01" | bash
